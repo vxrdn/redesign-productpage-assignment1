@@ -1,81 +1,138 @@
-import React, { useEffect, useRef } from 'react';
-import HeroSection from './components/HeroSection';
-import HomeFAQs from './components/HomeFAQ';
-import ContactForm from './components/ContactForm';
-import MainFooter from './components/MainFooter';
-import InfoSection from './components/InfoSection';
-import FeaturesGrid from './components/FeaturesGrid';
+"use client"
+
+import type React from "react"
+import { useEffect, useRef } from "react"
+import { motion } from "framer-motion"
+import Header from "@/components/shared/Header"
+import HeroSection from "./components/HeroSection"
+import HomeFAQs from "./components/HomeFAQ"
+import ContactForm from "./components/ContactForm"
+import MainFooter from "./components/MainFooter"
+import InfoSection from "./components/InfoSection"
+import FeaturesGrid from "./components/FeaturesGrid"
+import Testimonials from "./components/Testimonials"
+import TrustedBy from "./components/TrustedBy"
 
 const Home: React.FC = () => {
-	const contactRef = useRef(null);
-	const aboutRef = useRef(null);
-	const FqRef = useRef(null);
-	const scrollToSection = (ref) => {
-		ref.current.scrollIntoView({ behavior: 'smooth' });
-	};
+  const contactRef = useRef<HTMLDivElement>(null)
+  const aboutRef = useRef<HTMLDivElement>(null)
+  const featuresRef = useRef<HTMLDivElement>(null)
 
-	useEffect(() => {
-		let lastScrollTop = 0; // Initialize lastScrollTop variable
+  const scrollToSection = (ref: React.RefObject<HTMLElement>) => {
+    ref.current?.scrollIntoView({ behavior: "smooth" })
+  }
 
-		const handleScroll = () => {
-			const hcf = document.querySelector(".hcf-profile");
-			const scrollTop =
-				document.documentElement.scrollTop || document.body.scrollTop;
+  useEffect(() => {
+    let lastScrollTop = 0
 
-			if (scrollTop > lastScrollTop) {
-				if (hcf) {
-					hcf.classList.add("hcf-profile-fixed");
-				}
-			} else if (scrollTop < lastScrollTop) {
-				if (hcf) {
-					hcf.classList.remove("hcf-profile-fixed");
-				}
-			}
+    const handleScroll = () => {
+      const hcf = document.querySelector(".hcf-profile")
+      const scrollTop = window.scrollY || document.documentElement.scrollTop
 
-			lastScrollTop = scrollTop;
-		};
+      if (scrollTop > lastScrollTop) {
+        hcf?.classList.add("hcf-profile-fixed")
+      } else if (scrollTop < lastScrollTop) {
+        hcf?.classList.remove("hcf-profile-fixed")
+      }
 
+      lastScrollTop = scrollTop
+    }
 
-		// Add scroll event listener
-		window.addEventListener("scroll", handleScroll);
+    window.addEventListener("scroll", handleScroll)
+    return () => window.removeEventListener("scroll", handleScroll)
+  }, [])
 
-		// Cleanup the event listener on unmount
-		return () => {
-			window.removeEventListener("scroll", handleScroll);
-		};
-	}, []);
-	return (
-		<>
-			<div>
-				<div className="">
-					<HeroSection
-						scrollToSection={scrollToSection}
-						featuresRef={FqRef}
-						contactRef={contactRef}
-						aboutRef={aboutRef}
-					/>
-					{/* <div className='bg-white'>
-						<ClaimLandingSection />
-					</div> */}
-					<div className='!bg-[#eff6ff] relative'>
-						<FeaturesGrid />
-					</div>
-					<div className='!bg-white relative' ref={aboutRef}>
-						<InfoSection />
-					</div>
-					<div className='relative bg-white' ref={FqRef}>
-						<HomeFAQs />
-					</div>
-					<div className='bg-white relative' ref={contactRef}>
-						<ContactForm />
-					</div>
-					{/* <div className='bg-white'>
-						<MainFooter />
-					</div> */}
-				</div>
-			</div>
-		</>
-	);
-};
+  // Animation variants for sections
+  const fadeInUp = {
+    hidden: { opacity: 0, y: 60 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: { duration: 0.6, ease: "easeOut" },
+    },
+  }
 
-export default Home;
+  return (
+    <div className="flex flex-col min-h-screen bg-gradient-to-b from-white to-gray-50">
+      <Header 
+        scrollToSection={scrollToSection}
+        featuresRef={featuresRef}
+        contactRef={contactRef}
+        aboutRef={aboutRef}
+      />
+      <HeroSection
+        scrollToSection={scrollToSection}
+        featuresRef={featuresRef}
+        contactRef={contactRef}
+        aboutRef={aboutRef}
+      />
+
+      <motion.div
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, amount: 0.2 }}
+        variants={fadeInUp}
+        className="bg-white py-16"
+      >
+        <TrustedBy />
+      </motion.div>
+
+      <motion.div
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, amount: 0.2 }}
+        variants={fadeInUp}
+        className="bg-gradient-to-br from-blue-50 to-indigo-50 py-16"
+        ref={featuresRef}
+      >
+        <FeaturesGrid />
+      </motion.div>
+
+      <motion.div
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, amount: 0.2 }}
+        variants={fadeInUp}
+        className="bg-white py-16"
+        ref={aboutRef}
+      >
+        <InfoSection />
+      </motion.div>
+
+      <motion.div
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, amount: 0.2 }}
+        variants={fadeInUp}
+        className="bg-gradient-to-br from-indigo-50 to-purple-50 py-16"
+      >
+        <Testimonials />
+      </motion.div>
+
+      <motion.div
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, amount: 0.2 }}
+        variants={fadeInUp}
+        className="bg-white py-16"
+      >
+        <HomeFAQs />
+      </motion.div>
+
+      <motion.div
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, amount: 0.2 }}
+        variants={fadeInUp}
+        className="bg-gradient-to-br from-purple-50 to-blue-50 py-16"
+        ref={contactRef}
+      >
+        <ContactForm />
+      </motion.div>
+
+      <MainFooter />
+    </div>
+  )
+}
+
+export default Home
